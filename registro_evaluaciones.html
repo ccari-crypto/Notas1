@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Evaluaciones - Con Nube</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ESTILOS ORIGINALES */
+        :root {
+            --primary: #2c3e50;
+            --bg: #f4f6f8;
+            --text: #333;
+            --rojo: #e74c3c;
+            --azul: #2980b9;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            height: 90px;
+            flex-shrink: 0;
+        }
+
+        .profile-section { display: flex; align-items: center; gap: 15px; }
+        .profile-pic { width: 65px; height: 65px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .profile-pic img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-text { display: flex; flex-direction: column; }
+        .input-profile { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.3); color: white; padding: 2px; font-size: 0.9rem; width: 150px; }
+        .input-role { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; }
+
+        .title-section { text-align: center; }
+        .app-title { font-size: 1.5rem; font-weight: bold; margin: 0; }
+        .year-display { font-size: 1rem; opacity: 0.8; }
+
+        .logo-section { display: flex; justify-content: flex-end; align-items: center; }
+        .school-logo { width: 70px; height: 70px; background: white; border-radius: 8px; cursor: pointer; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 2px solid rgba(255,255,255,0.5); }
+        .school-logo img { width: 90%; height: 90%; object-fit: contain; }
+
+        .nav-bar { background: white; padding: 5px 20px; border-bottom: 1px solid #ddd; display: flex; justify-content: center; gap: 10px; flex-shrink: 0; }
+        .sem-btn { padding: 5px 20px; border: 2px solid var(--primary); background: transparent; border-radius: 15px; color: var(--primary); cursor: pointer; font-weight: bold; }
+        .sem-btn.active { background: var(--primary); color: white; }
+
+        .courses-bar { background: #e9ecef; padding: 8px 20px 0; display: flex; gap: 5px; overflow-x: auto; flex-shrink: 0; }
+        .course-tab { padding: 8px 20px; background: #cbd5e0; border-radius: 8px 8px 0 0; cursor: grab; user-select: none; font-weight: 500; color: #555; display: flex; align-items: center; gap: 5px; white-space: nowrap; font-size: 0.9rem; }
+        .course-tab.active { background: white; color: var(--primary); border-top: 4px solid var(--primary); font-weight: bold; }
+
+        main { flex: 1; display: flex; flex-direction: column; padding: 15px; background: white; overflow: hidden; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #ddd; align-items: center; margin-bottom: 10px; flex-shrink: 0; }
+        .tool-section { border-right: 1px solid #ccc; padding-right: 10px; display: flex; gap: 5px; align-items: center;}
+        
+        #tableContainer { flex: 1; overflow-y: auto; border: 1px solid #eee; position: relative; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 800px; }
+        
+        th { background: var(--primary); color: white; padding: 5px; position: sticky; top: 0; z-index: 10; border: 1px solid rgba(255,255,255,0.2); vertical-align: top;}
+        td { border: 1px solid #eee; padding: 2px; text-align: center; background: white; }
+
+        .th-avg { background: #2c3e50; border-left: 3px solid white; z-index: 20; }
+        .td-avg { border-left: 2px solid #ddd; background: #f9f9f9; font-weight: bold; font-size: 1.1rem; }
+
+        .name-input { width: 95%; padding: 5px; border: none; background: transparent; text-align: left; }
+        .name-input:focus { background: #f0f8ff; outline: none; }
+        
+        .score-input { width: 45px; font-size: 1rem; padding: 4px; text-align: center; border: 1px solid #ddd; border-radius: 4px; font-weight: 500; }
+        .score-input:focus { border-color: var(--primary); outline: none; background: #f0f8ff; }
+        
+        .eval-name-input { background: rgba(255,255,255,0.1); border: none; border-bottom: 1px solid rgba(255,255,255,0.3); color: white; text-align: center; width: 90%; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem;}
+        
+        .header-inputs-row { display: flex; justify-content: center; gap: 5px; align-items: center; font-size: 0.8rem;}
+        .mini-input { width: 35px; text-align: center; border: none; border-radius: 3px; font-weight: bold; padding: 2px; }
+
+        .grade-badge { font-weight: bold; margin-left: 2px; font-size: 1rem; width: 35px; display: inline-block; }
+        .rojo { color: var(--rojo); }
+        .azul { color: #2980b9; }
+
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        .btn-act { border: none; padding: 8px 12px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.85rem; }
+        .btn-blue { background: #3498db; }
+        .btn-red { background: #e74c3c; }
+        .btn-green { background: #27ae60; }
+        .btn-orange { background: #e67e22; }
+        .btn-danger { background: #c0392b; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; width: 450px; border-radius: 8px; max-height: 90vh; display: flex; flex-direction: column; }
+        .report-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding: 10px; background: #f1f1f1; border-radius: 5px; }
+        .radio-group { display: flex; gap: 15px; margin-bottom: 5px; }
+        .select-eval { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; display: none; }
+        .report-list { margin: 10px 0; padding: 10px; background: #fff; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; font-family: monospace; font-size: 0.9rem; white-space: pre-line; }
+        .share-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-share { flex: 1; padding: 10px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .wa { background: #25D366; }
+        .mail { background: #EA4335; }
+
+        @media print {
+            .toolbar, .nav-bar, .courses-bar, .header-controls { display: none !important; }
+            main { overflow: visible; padding: 0; }
+            #tableContainer { overflow: visible; }
+            th { position: static; color: black !important; border: 1px solid #000; background: transparent !important; } 
+            input { color: black !important; }
+            table, td { border: 1px solid #000; }
+        }
+
+        .dragging { opacity: 0.5; }
+
+        /* ESTILOS PARA LA NUBE */
+        .cloud-status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px 12px;
+            border-radius: 6px;
+            z-index: 9999;
+            border: 1px solid #ddd;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 200px;
+        }
+
+        .cloud-buttons {
+            display: flex;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .cloud-btn {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .cloud-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .message-box {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 20000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .token-modal {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .token-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .token-input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 5px solid #4CAF50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            color: #856404;
+        }
+
+        .error-box {
+            background: linear-gradient(135deg, #fdeaea 0%, #f9c6c6 100%);
+            border-left: 5px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            color: #721c24;
+        }
+
+        .step-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #4CAF50;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .button-group button {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .button-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-success { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; }
+        .btn-secondary { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; }
+        .btn-info { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; }
+        .btn-warning { background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #212529; }
+
+        .status-connected { color: #4CAF50; }
+        .status-disconnected { color: #ff9800; }
+        .status-error { color: #dc3545; }
+        .status-local { color: #6c757d; }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(76, 175, 80, 0.2);
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .copy-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Inputs ocultos para imágenes -->
+    <input type="file" id="fileProfile" accept="image/*" style="display:none">
+    <input type="file" id="fileLogo" accept="image/*" style="display:none">
+
+    <!-- Header -->
+    <header>
+        <div class="profile-section">
+            <div class="profile-pic" title="Subir foto">
+                <i class="fas fa-camera" id="iconProfile"></i>
+                <img id="imgProfile" style="display:none">
+            </div>
+            <div class="profile-text">
+                <input type="text" class="input-profile" id="profName" value="" placeholder="Tu Nombre...">
+                <input type="text" class="input-profile input-role" id="profRole" value="" placeholder="Cargo...">
+            </div>
+        </div>
+        <div class="title-section">
+            <div class="app-title" id="displayTitle">Registro de Evaluaciones</div>
+            <div class="year-display">Año Escolar <span id="displayYear">2025</span></div>
+        </div>
+        <div class="logo-section">
+            <div class="school-logo" title="Subir Logo">
+                <i class="fas fa-university" id="iconLogo"></i>
+                <img id="imgLogo" style="display:none">
+            </div>
+        </div>
+    </header>
+
+    <!-- Nav bar -->
+    <div class="nav-bar">
+        <button class="sem-btn active" id="btnSem1">1er Semestre</button>
+        <button class="sem-btn" id="btnSem2">2do Semestre</button>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+            <button onclick="mostrarConfigCloud()" style="cursor:pointer; background:none; border:none; color:#555; padding:5px 10px; border-radius:4px; border:1px solid #ddd;">
+                <i class="fas fa-cloud"></i> <span id="cloudBtnText">Configurar Nube</span>
+            </button>
+            <button onclick="openConfig()" style="cursor:pointer; background:none; border:none; color:#555">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Barra de cursos -->
+    <div class="courses-bar" id="tabsContainer"></div>
+
+    <!-- Main content -->
+    <main>
+        <div class="toolbar">
+            <button class="btn-act btn-danger" id="reportBtn" title="Generar Reporte">
+                <i class="fas fa-bell"></i> Reporte Riesgo
+            </button>
+            <div class="tool-section" style="margin-left:10px">
+                <div><small>Min</small><br><input type="number" id="cMin" style="width:35px"></div>
+                <div><small>Apr</small><br><input type="number" id="cPass" style="width:35px"></div>
+                <div><small>Max</small><br><input type="number" id="cMax" style="width:35px"></div>
+                <div><small>Ex%</small><br><input type="number" id="cEx" style="width:35px"></div>
+                <div><small>Color</small><br><input type="color" id="cColor" style="width:30px; padding:0;"></div>
+            </div>
+            <div class="tool-section">
+                <button class="btn-act btn-blue" id="addStudentBtn"><i class="fas fa-user-plus"></i></button>
+                <button class="btn-act btn-red" id="removeStudentBtn"><i class="fas fa-user-minus"></i></button>
+                <button class="btn-act btn-green" id="addEvalBtn"><i class="fas fa-plus-circle"></i> Eval</button>
+                <button class="btn-act btn-orange" id="removeEvalBtn"><i class="fas fa-minus-circle"></i></button>
+            </div>
+            <div style="margin-left:auto; display:flex; gap:5px;">
+                <button id="addCourseBtn" style="cursor:pointer; font-size:0.8rem">+ Curso</button>
+                <button id="deleteCourseBtn" style="cursor:pointer; color:red; font-size:0.8rem">Eliminar</button>
+            </div>
+        </div>
+        <div id="tableContainer"></div>
+    </main>
+
+    <!-- Modal de reporte -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--primary)">Generar Reporte</h3>
+            <div class="report-options">
+                <div class="radio-group">
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
+                        <input type="radio" name="rptType" value="eval" checked> Por Evaluación
+                    </label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
+                        <input type="radio" name="rptType" value="avg"> Promedio Semestral
+                    </label>
+                </div>
+                <select id="rptEvalSelect" class="select-eval"></select>
+                <button id="generateReportBtn" class="btn-act btn-blue" style="width:100%; justify-content:center;">
+                    Generar Lista
+                </button>
+            </div>
+            <div id="reportOutput" class="report-list"></div>
+            <div class="share-buttons">
+                <button class="btn-share wa" id="whatsappShareBtn">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="btn-share mail" id="mailShareBtn">
+                    <i class="fas fa-envelope"></i> Correo
+                </button>
+            </div>
+            <button id="closeReportBtn" style="margin-top:10px; width:100%; padding:8px; cursor:pointer;">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de configuración -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <h3>Configuración</h3>
+            <label>Título:</label><input type="text" id="confTitle" style="width:100%; margin-bottom:10px;">
+            <label>Año:</label><input type="number" id="confYear" style="width:100%; margin-bottom:10px;">
+            <label>Color:</label><input type="color" id="confColor" style="width:100%; height:40px; margin-bottom:20px;">
+            <button id="saveConfigBtn" class="btn-act btn-blue" style="width:100%">Guardar</button>
+            <button id="cancelConfigBtn" style="width:100%; margin-top:5px; padding:8px;">Cancelar</button>
+            <hr>
+            <button id="hardResetBtn" style="color:red; background:none; border:none; width:100%; cursor:pointer;">
+                Borrar datos
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de configuración de la NUBE SIMPLIFICADO -->
+    <div id="cloudModal" class="modal-overlay">
+        <div class="token-modal">
+            <h2 style="margin-top:0; color:#2c3e50; display:flex; align-items:center; gap:10px;">
+                <i class="fas fa-cloud" style="color:#4CAF50;"></i> Sincronización en la Nube
+            </h2>
+            
+            <div class="info-box">
+                <strong><i class="fas fa-info-circle"></i> ¿Para qué sirve?</strong>
+                <p style="margin:5px 0 0 0; font-size:14px;">
+                    Guarda tus datos en Internet para verlos desde cualquier dispositivo.
+                </p>
+            </div>
+            
+            <div class="step-box">
+                <div class="step-number">1</div>
+                <strong>Estado actual:</strong>
+                <div style="margin-top:10px; padding:10px; background:#fff; border-radius:4px; border:1px solid #eee;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span>Conexión a GitHub:</span>
+                        <span id="connectionStatus" style="font-weight:bold; color:#dc3545;">
+                            <i class="fas fa-times-circle"></i> No configurado
+                        </span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Última sincronización:</span>
+                        <span id="lastSyncTime">Nunca</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-box">
+                <div class="step-number">2</div>
+                <strong>Tu Token de GitHub:</strong>
+                <input type="password" id="githubTokenInput" class="token-input" 
+                       placeholder="Pega aquí tu token de GitHub">
+                <p style="font-size:13px; color:#666; margin:5px 0;">
+                    <i class="fas fa-key"></i> Consigue tu token en: github.com/settings/tokens
+                </p>
+                <button onclick="probarToken()" class="btn-success" style="width:100%; margin-top:10px; padding:12px;">
+                    <i class="fas fa-check"></i> Probar y Guardar Token
+                </button>
+            </div>
+            
+            <div class="warning-box">
+                <strong><i class="fas fa-exclamation-triangle"></i> Importante:</strong>
+                <p style="margin:5px 0 0 0; font-size:13px;">
+                    Al crear el token en GitHub, selecciona el permiso <strong>"gist"</strong>.
+                </p>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-success" onclick="forzarSincronizacion()" id="syncNowBtn">
+                    <i class="fas fa-sync"></i> Sincronizar Ahora
+                </button>
+                <button class="btn-info" onclick="cargarDesdeNube()">
+                    <i class="fas fa-download"></i> Cargar de la Nube
+                </button>
+                <button class="btn-secondary" onclick="ocultarConfigCloud()">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+            
+            <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+                <div style="display:flex; gap:10px;">
+                    <button onclick="exportarRespaldo()" style="flex:1; padding:10px; background:#6c757d; color:white; border:none; border-radius:4px; cursor:pointer;">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                    <button onclick="importarRespaldo()" style="flex:1; padding:10px; background:#17a2b8; color:white; border:none; border-radius:4px; cursor:pointer;">
+                        <i class="fas fa-file-import"></i> Importar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes flotantes -->
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- Estado de la nube flotante -->
+    <div id="cloudStatus" class="cloud-status">
+        <span id="cloudIcon"><i class="fas fa-cloud"></i></span>
+        <span id="cloudText">Solo local</span>
+        <div class="cloud-buttons">
+            <button class="cloud-btn" onclick="forzarSincronizacion()" title="Sincronizar ahora">
+                <i class="fas fa-sync"></i>
+            </button>
+            <button class="cloud-btn" onclick="mostrarConfigCloud()" title="Configurar nube">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURACIÓN PRINCIPAL - VERSIÓN LIMPIA
+        // ============================================
+        
+        // Datos de la aplicación (EN BLANCO)
+        const DEFAULT = { 
+            global: { 
+                title: "Registro de Evaluaciones", 
+                year: new Date().getFullYear(),
+                color: "#2c3e50", 
+                profName: "", 
+                profRole: "", 
+                imgProf: null, 
+                imgLogo: null 
+            }, 
+            semester: 1, 
+            activeCourseIdx: 0, 
+            courses: [{ 
+                id: 'c' + Date.now(), 
+                name: "1° Medio A", 
+                color: "#2c3e50", 
+                params: { min: 1.0, pass: 4.0, max: 7.0, ex: 60 }, 
+                students: [{id: 's' + Date.now(), name: ''}], 
+                sem1: { evals: [{name: "Eval 1", max: 45, weight: 20}], scores: {} }, 
+                sem2: { evals: [{name: "Eval 1", max: 45, weight: 20}], scores: {} } 
+            }] 
+        };
+
+        let app = JSON.parse(JSON.stringify(DEFAULT));
+        let currentReportText = "";
+        let dragSrc = null;
+        
+        // Variables para la nube (LIMPIAS)
+        let GITHUB_TOKEN = "";
+        let syncEnabled = false;
+        let sincronizando = false;
+        let ultimaSincronizacion = null;
+        let gistId = null;
+
+        // ============================================
+        // FUNCIONES BÁSICAS DE LA APLICACIÓN
+        // ============================================
+
+        function mostrarMensaje(texto, tipo = 'info', duracion = 3000) {
+            const colores = {
+                info: '#2196F3',
+                success: '#4CAF50',
+                warning: '#FF9800',
+                error: '#F44336'
+            };
+            
+            const iconos = {
+                info: 'fas fa-info-circle',
+                success: 'fas fa-check-circle',
+                warning: 'fas fa-exclamation-triangle',
+                error: 'fas fa-times-circle'
+            };
+            
+            const box = document.getElementById('messageBox');
+            box.innerHTML = `<i class="${iconos[tipo]}"></i> ${texto}`;
+            box.style.backgroundColor = colores[tipo];
+            box.style.display = 'block';
+            
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, duracion);
+            
+            console.log(`[${tipo.toUpperCase()}] ${texto}`);
+        }
+
+        function actualizarEstadoCloud() {
+            const icon = document.getElementById('cloudIcon');
+            const text = document.getElementById('cloudText');
+            const btnText = document.getElementById('cloudBtnText');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const lastSync = document.getElementById('lastSyncTime');
+            
+            if (sincronizando) {
+                icon.innerHTML = '<div class="loading-spinner"></div>';
+                text.textContent = 'Sincronizando...';
+                btnText.textContent = 'Sincronizando...';
+            } else if (syncEnabled && ultimaSincronizacion) {
+                icon.innerHTML = '<i class="fas fa-cloud" style="color:#4CAF50;"></i>';
+                const tiempo = new Date(parseInt(ultimaSincronizacion));
+                text.textContent = `Sinc: ${tiempo.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                btnText.textContent = 'En la nube ✓';
+                connectionStatus.innerHTML = '<i class="fas fa-check-circle"></i> <span style="color:#4CAF50;">Conectado</span>';
+                lastSync.textContent = tiempo.toLocaleString();
+            } else if (GITHUB_TOKEN && GITHUB_TOKEN.length > 20) {
+                icon.innerHTML = '<i class="fas fa-cloud-slash" style="color:#FF9800;"></i>';
+                text.textContent = 'Configurar nube';
+                btnText.textContent = 'Configurar nube';
+                connectionStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span style="color:#FF9800;">Token configurado</span>';
+                lastSync.textContent = 'Nunca';
+            } else {
+                icon.innerHTML = '<i class="fas fa-desktop" style="color:#6c757d;"></i>';
+                text.textContent = 'Solo local';
+                btnText.textContent = 'Configurar nube';
+                connectionStatus.innerHTML = '<i class="fas fa-times-circle"></i> <span style="color:#dc3545;">No configurado</span>';
+                lastSync.textContent = 'Nunca';
+            }
+        }
+
+        // ============================================
+        // FUNCIONES PRINCIPALES DE LA NUBE (SIMPLIFICADAS)
+        // ============================================
+
+        async function verificarToken(token) {
+            if (!token || token.length < 20) return false;
+            
+            try {
+                const response = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        async function probarToken() {
+            const nuevoToken = document.getElementById('githubTokenInput').value.trim();
+            
+            if (!nuevoToken || nuevoToken.length < 20) {
+                mostrarMensaje('El token parece inválido', 'error');
+                return;
+            }
+            
+            mostrarMensaje('Probando token...', 'info');
+            
+            const tokenValido = await verificarToken(nuevoToken);
+            
+            if (tokenValido) {
+                GITHUB_TOKEN = nuevoToken;
+                localStorage.setItem('github_token', nuevoToken);
+                mostrarMensaje('✅ Token válido. Ahora puedes sincronizar.', 'success');
+                syncEnabled = true;
+            } else {
+                mostrarMensaje('❌ Token no válido. Asegúrate de tener permiso "gist".', 'error');
+            }
+            
+            actualizarEstadoCloud();
+        }
+
+        async function guardarEnLaNube() {
+            if (!GITHUB_TOKEN || GITHUB_TOKEN.length < 20) {
+                mostrarMensaje('Primero configura un token de GitHub', 'warning');
+                return false;
+            }
+            
+            sincronizando = true;
+            actualizarEstadoCloud();
+            
+            try {
+                mostrarMensaje('Guardando en la nube...', 'info');
+                
+                // Crear o actualizar el Gist
+                const gistData = {
+                    files: {
+                        ['registro_evaluaciones.json']: {
+                            content: JSON.stringify(app, null, 2)
+                        }
+                    },
+                    description: `Registro Escolar - ${new Date().toLocaleDateString()}`,
+                    public: false
+                };
+                
+                let url = 'https://api.github.com/gists';
+                let method = 'POST';
+                
+                if (gistId) {
+                    url = `https://api.github.com/gists/${gistId}`;
+                    method = 'PATCH';
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify(gistData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}`);
+                }
+                
+                const result = await response.json();
+                gistId = result.id;
+                localStorage.setItem('cloud_gist_id', gistId);
+                
+                syncEnabled = true;
+                ultimaSincronizacion = Date.now();
+                localStorage.setItem('last_sync', ultimaSincronizacion.toString());
+                
+                mostrarMensaje('✅ Guardado en la nube correctamente', 'success');
+                return true;
+                
+            } catch (error) {
+                console.error('Error guardando en la nube:', error);
+                mostrarMensaje('❌ No se pudo guardar en la nube. Verifica tu token.', 'error');
+                syncEnabled = false;
+                return false;
+            } finally {
+                sincronizando = false;
+                actualizarEstadoCloud();
+            }
+        }
+
+        async function cargarDesdeNube() {
+            if (!GITHUB_TOKEN || GITHUB_TOKEN.length < 20) {
+                mostrarMensaje('Primero configura un token de GitHub', 'warning');
+                return;
+            }
+            
+            if (!gistId) {
+                mostrarMensaje('No hay datos guardados en la nube todavía', 'info');
+                return;
+            }
+            
+            sincronizando = true;
+            actualizarEstadoCloud();
+            
+            try {
+                mostrarMensaje('Cargando desde la nube...', 'info');
+                
+                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('No se pudo cargar');
+                }
+                
+                const datos = await response.json();
+                const archivo = datos.files['registro_evaluaciones.json'];
+                
+                if (!archivo || !archivo.content) {
+                    throw new Error('No se encontraron datos');
+                }
+                
+                const datosCargados = JSON.parse(archivo.content);
+                
+                if (confirm('¿Cargar datos de la nube? Se reemplazarán los datos locales.')) {
+                    app = datosCargados;
+                    saveLocal();
+                    render();
+                    loadGlobalUI();
+                    mostrarMensaje('✅ Datos cargados desde la nube', 'success');
+                }
+                
+                syncEnabled = true;
+                ultimaSincronizacion = Date.now();
+                localStorage.setItem('last_sync', ultimaSincronizacion.toString());
+                
+            } catch (error) {
+                mostrarMensaje('❌ Error cargando de la nube', 'error');
+            } finally {
+                sincronizando = false;
+                actualizarEstadoCloud();
+            }
+        }
+
+        function forzarSincronizacion() {
+            guardarEnLaNube();
+        }
+
+        function exportarRespaldo() {
+            const datos = JSON.stringify(app, null, 2);
+            const blob = new Blob([datos], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `respaldo-registro-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            mostrarMensaje('📁 Respaldo exportado', 'success');
+        }
+
+        function importarRespaldo() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const datos = JSON.parse(event.target.result);
+                        app = datos;
+                        saveLocal();
+                        render();
+                        loadGlobalUI();
+                        mostrarMensaje('✅ Datos importados', 'success');
+                    } catch (error) {
+                        mostrarMensaje('❌ Error importando', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // ============================================
+        // FUNCIONES ORIGINALES DE LA APLICACIÓN (COMPLETAS)
+        // ============================================
+
+        function saveLocal() {
+            localStorage.setItem('gradebook_v10', JSON.stringify(app));
+        }
+
+        function save() {
+            saveLocal();
+            if (syncEnabled && GITHUB_TOKEN && GITHUB_TOKEN.length > 20) {
+                guardarEnLaNube();
+            }
+        }
+
+        function loadData() {
+            const datos = localStorage.getItem('gradebook_v10');
+            if (datos) {
+                try {
+                    app = JSON.parse(datos);
+                } catch (e) {
+                    app = JSON.parse(JSON.stringify(DEFAULT));
+                }
+            }
+        }
+
+        function getActiveCourse() { 
+            if(app.courses.length === 0) return null; 
+            if(app.activeCourseIdx >= app.courses.length) app.activeCourseIdx = 0; 
+            return app.courses[app.activeCourseIdx]; 
+        }
+
+        function calculateGrade(score, total, params) { 
+            if(score === "" || score === null || isNaN(parseFloat(score))) return null;
+            score = parseFloat(score); 
+            total = parseFloat(total); 
+            if(total <= 0) return null;
+            
+            const exigence = params.ex / 100;
+            const cut = total * exigence;
+            
+            let grade;
+            if(score < cut) {
+                grade = params.min + ((params.pass - params.min) * score) / cut;
+            } else {
+                grade = params.pass + ((params.max - params.pass) * (score - cut)) / (total - cut);
+            }
+            return Math.round(grade * 10) / 10;
+        }
+
+        function calculateWeightedAvg(studentId, semData, params) {
+            let totalWeighted = 0;
+            let totalWeights = 0;
+            let hasGrades = false;
+
+            semData.evals.forEach((ev, i) => {
+                const scores = semData.scores[studentId] || [];
+                const val = scores[i];
+                if(val !== undefined && val !== "" && val !== null) {
+                    const grade = calculateGrade(val, ev.max, params);
+                    const weight = parseFloat(ev.weight) || 0;
+                    if(grade !== null) {
+                        totalWeighted += grade * weight;
+                        totalWeights += weight;
+                        hasGrades = true;
+                    }
+                }
+            });
+
+            if (!hasGrades) return null;
+            if (totalWeights === 0) return 0;
+            
+            return Math.round((totalWeighted / totalWeights) * 10) / 10;
+        }
+
+        function handleScoreInput(sid, idx, el) {
+            const value = el.value;
+            const c = getActiveCourse();
+            const d = app.semester === 1 ? c.sem1 : c.sem2;
+            
+            if(!d.scores[sid]) d.scores[sid] = [];
+            d.scores[sid][idx] = value; 
+            save();
+            
+            const grade = calculateGrade(value, d.evals[idx].max, c.params);
+            const badge = document.getElementById(`badge-${sid}-${idx}`);
+            
+            if(badge) { 
+                badge.innerText = grade !== null ? grade.toFixed(1) : ""; 
+                badge.className = `grade-badge ${grade !== null && grade < c.params.pass ? 'rojo' : 'azul'}`; 
+            }
+
+            updateFinalAvg(sid);
+        }
+
+        function updateFinalAvg(sid) {
+            const c = getActiveCourse();
+            const d = app.semester === 1 ? c.sem1 : c.sem2;
+            const avg = calculateWeightedAvg(sid, d, c.params);
+            const cell = document.getElementById(`avg-${sid}`);
+            
+            if(cell) {
+                cell.innerText = avg !== null ? avg.toFixed(1) : "";
+                cell.style.color = (avg !== null && avg < c.params.pass) ? "var(--rojo)" : "var(--azul)";
+            }
+        }
+
+        function handleEvalNameChange(i, v) { 
+            const c = getActiveCourse(); 
+            (app.semester === 1 ? c.sem1 : c.sem2).evals[i].name = v; 
+            save(); 
+        }
+
+        function handleEvalMaxChange(i, v) { 
+            const c = getActiveCourse(); 
+            (app.semester === 1 ? c.sem1 : c.sem2).evals[i].max = v; 
+            save(); 
+            render(); 
+        }
+
+        function handleEvalWeightChange(i, v) { 
+            const c = getActiveCourse(); 
+            (app.semester === 1 ? c.sem1 : c.sem2).evals[i].weight = v; 
+            save(); 
+            render();
+        }
+
+        // --- ACCIONES PRINCIPALES ---
+        function addCourse() { 
+            const name = prompt("Nombre del curso:");
+            if(!name) return;
+            
+            app.courses.push({
+                id: 'c' + Date.now(),
+                name: name,
+                color: app.global.color,
+                params: {
+                    min: 1.0,
+                    pass: 4.0,
+                    max: 7.0,
+                    ex: 60
+                },
+                students: [{id: 's' + Date.now(), name: ''}],
+                sem1: {
+                    evals: [{name: "Eval 1", max: 45, weight: 20}],
+                    scores: {}
+                },
+                sem2: {
+                    evals: [{name: "Eval 1", max: 45, weight: 20}],
+                    scores: {}
+                }
+            });
+            
+            app.activeCourseIdx = app.courses.length - 1; 
+            save(); 
+            render(); 
+        }
+
+        function deleteCourse() { 
+            if(!confirm("¿Borrar curso?")) return;
+            app.courses.splice(app.activeCourseIdx, 1);
+            app.activeCourseIdx = 0; 
+            save(); 
+            render(); 
+        }
+
+        function addStudent() { 
+            const c = getActiveCourse(); 
+            if(!c) return;
+            c.students.push({id: 's' + Date.now(), name: ''}); 
+            save(); 
+            render(); 
+        }
+
+        function removeStudent() { 
+            const c = getActiveCourse(); 
+            if(!c || c.students.length === 0) return;
+            
+            if(confirm("¿Eliminar último estudiante?")) { 
+                c.students.pop(); 
+                save(); 
+                render(); 
+            } 
+        }
+
+        function addEval() { 
+            const c = getActiveCourse(); 
+            if(!c) return;
+            (app.semester === 1 ? c.sem1 : c.sem2).evals.push({name: `Eval ${c.sem1.evals.length + 1}`, max: 45, weight: 10}); 
+            save(); 
+            render(); 
+        }
+
+        function removeEval() { 
+            const c = getActiveCourse();
+            const d = app.semester === 1 ? c.sem1 : c.sem2;
+            
+            if(!c) return;
+            if(d.evals.length > 0 && confirm("¿Borrar última evaluación?")) { 
+                d.evals.pop(); 
+                save(); 
+                render(); 
+            } 
+        }
+
+        function updateCourseParams() { 
+            const c = getActiveCourse(); 
+            c.params.min = parseFloat(document.getElementById('cMin').value);
+            c.params.pass = parseFloat(document.getElementById('cPass').value);
+            c.params.max = parseFloat(document.getElementById('cMax').value);
+            c.params.ex = parseFloat(document.getElementById('cEx').value);
+            save(); 
+            render(); 
+        }
+
+        function updateCourseColor(v) { 
+            getActiveCourse().color = v; 
+            save(); 
+            render(); 
+        }
+
+        // --- DRAG & DROP ---
+        function handleDragStart(e) { 
+            this.classList.add('dragging');
+            dragSrc = this;
+            e.dataTransfer.setData('idx', this.getAttribute('data-idx'));
+        }
+
+        function handleDrop(e) { 
+            e.stopPropagation(); 
+            const fromIdx = parseInt(e.dataTransfer.getData('idx'));
+            const toIdx = parseInt(this.getAttribute('data-idx'));
+            
+            if(fromIdx !== toIdx) { 
+                const moved = app.courses.splice(fromIdx, 1)[0];
+                app.courses.splice(toIdx, 0, moved);
+                app.activeCourseIdx = toIdx;
+                save(); 
+                render(); 
+            } 
+            return false;
+        }
+
+        // --- UTILITIES ---
+        function uploadImage(type, input) { 
+            const file = input.files[0]; 
+            if(!file || file.size > 800000) return alert("Error: imagen demasiado grande");
+            
+            const reader = new FileReader();
+            reader.onload = e => {
+                if(type === 'profile') app.global.imgProf = e.target.result;
+                if(type === 'logo') app.global.imgLogo = e.target.result;
+                save(); 
+                loadGlobalUI();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateGlobal(key, value) { 
+            app.global[key] = value; 
+            save(); 
+        }
+
+        function loadGlobalUI() { 
+            document.getElementById('displayTitle').innerText = app.global.title;
+            document.getElementById('displayYear').innerText = app.global.year;
+            document.documentElement.style.setProperty('--primary', app.global.color);
+            document.getElementById('profName').value = app.global.profName;
+            document.getElementById('profRole').value = app.global.profRole;
+            
+            if(app.global.imgProf) {
+                document.getElementById('imgProfile').src = app.global.imgProf;
+                document.getElementById('imgProfile').style.display = 'block';
+                document.getElementById('iconProfile').style.display = 'none';
+            }
+            
+            if(app.global.imgLogo) {
+                document.getElementById('imgLogo').src = app.global.imgLogo;
+                document.getElementById('imgLogo').style.display = 'block';
+                document.getElementById('iconLogo').style.display = 'none';
+            }
+        }
+
+        function shareWhatsapp() { 
+            if(!currentReportText) return alert("Genera una lista primero");
+            window.open(`https://wa.me/?text=${encodeURIComponent(currentReportText)}`, '_blank');
+        }
+
+        function shareMail() { 
+            if(!currentReportText) return alert("Genera una lista primero");
+            window.open(`mailto:?subject=Informe Calificaciones&body=${encodeURIComponent(currentReportText)}`);
+        }
+
+        function setSemester(s) { 
+            app.semester = s; 
+            save(); 
+            render(); 
+        }
+
+        function openConfig() { 
+            document.getElementById('confTitle').value = app.global.title;
+            document.getElementById('confYear').value = app.global.year;
+            document.getElementById('confColor').value = app.global.color;
+            document.getElementById('configModal').style.display = 'flex';
+        }
+
+        function saveGlobalConfig() { 
+            app.global.title = document.getElementById('confTitle').value;
+            app.global.year = document.getElementById('confYear').value;
+            app.global.color = document.getElementById('confColor').value;
+            save(); 
+            loadGlobalUI();
+            document.getElementById('configModal').style.display = 'none';
+        }
+
+        function hardReset() { 
+            if(confirm("¿Borrar todos los datos? Esto no se puede deshacer.")) { 
+                localStorage.removeItem('gradebook_v10'); 
+                localStorage.removeItem('cloud_gist_id');
+                localStorage.removeItem('github_token');
+                localStorage.removeItem('last_sync');
+                location.reload(); 
+            } 
+        }
+
+        // --- REPORT FUNCTIONS ---
+        function openReportModal() {
+            const c = getActiveCourse(); 
+            if(!c) return;
+            
+            const select = document.getElementById('rptEvalSelect'); 
+            select.innerHTML = "";
+            const semData = app.semester === 1 ? c.sem1 : c.sem2;
+            
+            semData.evals.forEach((ev, i) => { 
+                const opt = document.createElement('option'); 
+                opt.value = i; 
+                opt.innerText = ev.name || `Eval ${i+1}`; 
+                select.appendChild(opt); 
+            });
+            
+            toggleReportUI(); 
+            document.getElementById('reportOutput').innerHTML = ""; 
+            currentReportText = ""; 
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function toggleReportUI() { 
+            const type = document.querySelector('input[name="rptType"]:checked').value; 
+            document.getElementById('rptEvalSelect').style.display = type === 'eval' ? 'block' : 'none'; 
+        }
+
+        function generateReport() {
+            const c = getActiveCourse();
+            const semData = app.semester === 1 ? c.sem1 : c.sem2;
+            const type = document.querySelector('input[name="rptType"]:checked').value;
+            const passGrade = c.params.pass;
+            let list = "", header = "", count = 0;
+
+            if (type === 'eval') {
+                const idx = document.getElementById('rptEvalSelect').value;
+                const ename = semData.evals[idx].name || "Evaluación";
+                header = `Estimados apoderados, esperando se encuentren bien, quiero comunicar que los siguientes estudiantes tuvieron nota insuficiente en la evaluación "${ename}", a continuación el detalle:`;
+                
+                c.students.forEach(s => {
+                    const val = (semData.scores[s.id]||[])[idx];
+                    const g = calculateGrade(val, semData.evals[idx].max, c.params);
+                    if (g !== null && g < passGrade) { 
+                        list += `- ${s.name || "Sin Nombre"}: Nota ${g.toFixed(1)}\n`; 
+                        count++; 
+                    }
+                });
+            } else {
+                header = `Estimados apoderados, esperando se encuentren bien, quiero comunicar que los siguientes estudiantes presentan un promedio semestral insuficiente, a continuación el detalle:`;
+                
+                c.students.forEach(s => {
+                    const avg = calculateWeightedAvg(s.id, semData, c.params);
+                    if(avg !== null && avg < passGrade) { 
+                        list += `- ${s.name || "Sin Nombre"}: Promedio ${avg.toFixed(1)}\n`; 
+                        count++; 
+                    }
+                });
+            }
+
+            const footer = `\nPor más detalles, agendar entrevista con docente al siguiente mail\nc.cari@nsmquilpue.cl, sin otro particular, se despide cordialmente, Profesor Cristian Cari.`;
+
+            if (count === 0) {
+                currentReportText = ""; 
+                document.getElementById('reportOutput').innerHTML = "<span style='color:green'>No hay estudiantes en riesgo.</span>";
+            } else {
+                currentReportText = `${header}\n\n${list}${footer}`; 
+                document.getElementById('reportOutput').innerText = currentReportText;
+            }
+        }
+
+        // --- RENDER ---
+        function render() {
+            const c = getActiveCourse();
+            const tabs = document.getElementById('tabsContainer');
+            const table = document.getElementById('tableContainer');
+            
+            document.getElementById('btnSem1').className = app.semester === 1 ? 'sem-btn active' : 'sem-btn';
+            document.getElementById('btnSem2').className = app.semester === 2 ? 'sem-btn active' : 'sem-btn';
+            
+            // Tabs
+            tabs.innerHTML = '';
+            app.courses.forEach((course, i) => {
+                const tab = document.createElement('div');
+                tab.className = `course-tab ${i === app.activeCourseIdx ? 'active' : ''}`;
+                tab.draggable = true;
+                tab.setAttribute('data-idx', i);
+                tab.innerHTML = `<i class="fas fa-grip-vertical" style="opacity:0.3"></i> ${course.name}`;
+                
+                if(i === app.activeCourseIdx) {
+                    tab.style.borderTopColor = course.color;
+                    tab.style.color = course.color;
+                }
+                
+                tab.onclick = () => {
+                    app.activeCourseIdx = i;
+                    save();
+                    render();
+                };
+                
+                tab.addEventListener('dragstart', handleDragStart);
+                tab.addEventListener('dragover', e => e.preventDefault());
+                tab.addEventListener('drop', handleDrop);
+                tab.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                });
+                
+                tabs.appendChild(tab);
+            });
+
+            if(!c) { 
+                table.innerHTML = "<p style='text-align:center; padding:20px'>Crea un curso.</p>"; 
+                return; 
+            }
+            
+            // Toolbar inputs
+            document.getElementById('cMin').value = c.params.min;
+            document.getElementById('cPass').value = c.params.pass;
+            document.getElementById('cMax').value = c.params.max;
+            document.getElementById('cEx').value = c.params.ex;
+            document.getElementById('cColor').value = c.color;
+
+            const semData = app.semester === 1 ? c.sem1 : c.sem2;
+            
+            // HEADERS
+            let html = `<table><thead><tr><th style="width:250px; background:${c.color}">Alumnos (${c.students.length})</th>`;
+            
+            semData.evals.forEach((ev, i) => {
+                const weight = ev.weight !== undefined ? ev.weight : 0;
+                html += `<th style="background:${c.color}">
+                    <input type="text" class="eval-name-input" value="${ev.name || 'Eval ' + (i + 1)}" 
+                           placeholder="Nombre" data-eval-index="${i}" data-field="name">
+                    <div class="header-inputs-row">
+                        <label title="Puntaje Total">Pts:</label>
+                        <input type="number" class="mini-input" value="${ev.max}" 
+                               data-eval-index="${i}" data-field="max">
+                        <label title="Porcentaje">%:</label>
+                        <input type="number" class="mini-input" value="${weight}" 
+                               data-eval-index="${i}" data-field="weight">
+                    </div>
+                </th>`;
+            });
+            
+            html += `<th class="th-avg" style="width:80px;">Promedio</th>`;
+            html += "</tr></thead><tbody>";
+            
+            // BODY
+            c.students.forEach(student => {
+                html += `<tr><td style="text-align:left">
+                    <input type="text" value="${student.name}" class="name-input" 
+                           placeholder="Nombre..." data-student-id="${student.id}">
+                </td>`;
+                
+                const scores = semData.scores[student.id] || [];
+                
+                semData.evals.forEach((ev, i) => {
+                    const value = scores[i] !== undefined ? scores[i] : "";
+                    const grade = calculateGrade(value, ev.max, c.params);
+                    const colorClass = grade ? (grade < c.params.pass ? 'rojo' : 'azul') : '';
+                    
+                    html += `<td>
+                        <input type="number" class="score-input" value="${value}" 
+                               data-student-id="${student.id}" data-eval-index="${i}">
+                        <span id="badge-${student.id}-${i}" class="grade-badge ${colorClass}">
+                            ${grade ? grade.toFixed(1) : ''}
+                        </span>
+                    </td>`;
+                });
+
+                const finalAvg = calculateWeightedAvg(student.id, semData, c.params);
+                const finalColor = (finalAvg !== null && finalAvg < c.params.pass) ? "var(--rojo)" : "var(--azul)";
+                
+                html += `<td class="td-avg" style="color:${finalColor}" id="avg-${student.id}">
+                    ${finalAvg !== null ? finalAvg.toFixed(1) : ''}
+                </td>`;
+                
+                html += "</tr>";
+            });
+            
+            html += "</tbody></table>";
+            table.innerHTML = html;
+            
+            // Reasignar event listeners
+            setupDynamicEventListeners();
+        }
+
+        // ============================================
+        // INTERFAZ DE LA NUBE
+        // ============================================
+
+        function mostrarConfigCloud() {
+            document.getElementById('cloudModal').style.display = 'flex';
+            document.getElementById('githubTokenInput').value = GITHUB_TOKEN || '';
+            actualizarEstadoCloud();
+        }
+
+        function ocultarConfigCloud() {
+            document.getElementById('cloudModal').style.display = 'none';
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+
+        function setupEventListeners() {
+            // Profile image upload
+            document.getElementById('fileProfile').addEventListener('change', (e) => {
+                uploadImage('profile', e.target);
+            });
+            
+            document.getElementById('fileLogo').addEventListener('change', (e) => {
+                uploadImage('logo', e.target);
+            });
+            
+            // Profile click handlers
+            document.querySelector('.profile-pic').addEventListener('click', () => {
+                document.getElementById('fileProfile').click();
+            });
+            
+            document.querySelector('.school-logo').addEventListener('click', () => {
+                document.getElementById('fileLogo').click();
+            });
+            
+            // Profile inputs
+            document.getElementById('profName').addEventListener('change', (e) => {
+                updateGlobal('profName', e.target.value);
+            });
+            
+            document.getElementById('profRole').addEventListener('change', (e) => {
+                updateGlobal('profRole', e.target.value);
+            });
+            
+            // Semester buttons
+            document.getElementById('btnSem1').addEventListener('click', () => setSemester(1));
+            document.getElementById('btnSem2').addEventListener('click', () => setSemester(2));
+            
+            // Toolbar buttons
+            document.getElementById('reportBtn').addEventListener('click', openReportModal);
+            document.getElementById('addStudentBtn').addEventListener('click', addStudent);
+            document.getElementById('removeStudentBtn').addEventListener('click', removeStudent);
+            document.getElementById('addEvalBtn').addEventListener('click', addEval);
+            document.getElementById('removeEvalBtn').addEventListener('click', removeEval);
+            document.getElementById('addCourseBtn').addEventListener('click', addCourse);
+            document.getElementById('deleteCourseBtn').addEventListener('click', deleteCourse);
+            
+            // Course params
+            document.getElementById('cMin').addEventListener('change', updateCourseParams);
+            document.getElementById('cPass').addEventListener('change', updateCourseParams);
+            document.getElementById('cMax').addEventListener('change', updateCourseParams);
+            document.getElementById('cEx').addEventListener('change', updateCourseParams);
+            document.getElementById('cColor').addEventListener('change', (e) => {
+                updateCourseColor(e.target.value);
+            });
+            
+            // Config modal
+            document.querySelector('[onclick="openConfig()"]').addEventListener('click', openConfig);
+            document.getElementById('saveConfigBtn').addEventListener('click', saveGlobalConfig);
+            document.getElementById('cancelConfigBtn').addEventListener('click', () => {
+                document.getElementById('configModal').style.display = 'none';
+            });
+            document.getElementById('hardResetBtn').addEventListener('click', hardReset);
+            
+            // Report modal
+            document.querySelectorAll('input[name="rptType"]').forEach(radio => {
+                radio.addEventListener('change', toggleReportUI);
+            });
+            
+            document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+            document.getElementById('whatsappShareBtn').addEventListener('click', shareWhatsapp);
+            document.getElementById('mailShareBtn').addEventListener('click', shareMail);
+            document.getElementById('closeReportBtn').addEventListener('click', () => {
+                document.getElementById('reportModal').style.display = 'none';
+            });
+            
+            // Cerrar modales al hacer clic fuera
+            window.addEventListener('click', (event) => {
+                const cloudModal = document.getElementById('cloudModal');
+                const configModal = document.getElementById('configModal');
+                const reportModal = document.getElementById('reportModal');
+                
+                if (event.target === cloudModal) {
+                    cloudModal.style.display = 'none';
+                }
+                if (event.target === configModal) {
+                    configModal.style.display = 'none';
+                }
+                if (event.target === reportModal) {
+                    reportModal.style.display = 'none';
+                }
+            });
+        }
+
+        function setupDynamicEventListeners() {
+            // Student name inputs
+            document.querySelectorAll('.name-input[data-student-id]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const studentId = this.getAttribute('data-student-id');
+                    const c = getActiveCourse();
+                    const student = c.students.find(s => s.id === studentId);
+                    if(student) {
+                        student.name = this.value;
+                        save();
+                    }
+                });
+            });
+            
+            // Score inputs
+            document.querySelectorAll('.score-input[data-student-id]').forEach(input => {
+                input.addEventListener('input', function() {
+                    const studentId = this.getAttribute('data-student-id');
+                    const evalIndex = parseInt(this.getAttribute('data-eval-index'));
+                    handleScoreInput(studentId, evalIndex, this);
+                });
+            });
+            
+            // Evaluation header inputs
+            document.querySelectorAll('.eval-name-input[data-eval-index]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const evalIndex = parseInt(this.getAttribute('data-eval-index'));
+                    const field = this.getAttribute('data-field');
+                    
+                    if(field === 'name') {
+                        handleEvalNameChange(evalIndex, this.value);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.mini-input[data-eval-index]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const evalIndex = parseInt(this.getAttribute('data-eval-index'));
+                    const field = this.getAttribute('data-field');
+                    const value = this.value;
+                    
+                    if(field === 'max') {
+                        handleEvalMaxChange(evalIndex, value);
+                    } else if(field === 'weight') {
+                        handleEvalWeightChange(evalIndex, value);
+                    }
+                });
+            });
+        }
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        async function iniciarAplicacion() {
+            // Limpiar localStorage existente
+            localStorage.removeItem('gradebook_v10');
+            localStorage.removeItem('cloud_gist_id');
+            localStorage.removeItem('github_token');
+            localStorage.removeItem('last_sync');
+            
+            // Cargar datos limpios
+            loadData();
+            
+            // Cargar interfaz
+            loadGlobalUI();
+            render();
+            setupEventListeners();
+            actualizarEstadoCloud();
+            
+            mostrarMensaje('Aplicación lista - Configure su token de GitHub', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            iniciarAplicacion();
+        });
+
+        // Sincronizar cada 10 minutos si hay conexión
+        setInterval(() => {
+            if (syncEnabled && GITHUB_TOKEN && GITHUB_TOKEN.length > 20) {
+                guardarEnLaNube();
+            }
+        }, 10 * 60 * 1000);
+
+    </script>
+
+</body>
+</html>
