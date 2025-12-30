@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Evaluaciones V10</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <input type="file" id="fileProfile" accept="image/*" style="display:none">
+    <input type="file" id="fileLogo" accept="image/*" style="display:none">
+
+    <header>
+        <div class="profile-section">
+            <div class="profile-pic" title="Subir foto">
+                <i class="fas fa-camera" id="iconProfile"></i>
+                <img id="imgProfile" style="display:none">
+            </div>
+            <div class="profile-text">
+                <input type="text" class="input-profile" id="profName" value="Nombre Docente" placeholder="Tu Nombre...">
+                <input type="text" class="input-profile input-role" id="profRole" value="Encargado Convivencia" placeholder="Cargo...">
+            </div>
+        </div>
+        <div class="title-section">
+            <div class="app-title" id="displayTitle">Registro de Evaluaciones</div>
+            <div class="year-display">Año Escolar <span id="displayYear">2026</span></div>
+        </div>
+        <div class="logo-section">
+            <div class="school-logo" title="Subir Logo">
+                <i class="fas fa-university" id="iconLogo"></i>
+                <img id="imgLogo" style="display:none">
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-bar">
+        <button class="sem-btn active" id="btnSem1">1er Semestre</button>
+        <button class="sem-btn" id="btnSem2">2do Semestre</button>
+        <button id="configBtn" style="margin-left:auto; cursor:pointer; background:none; border:none; color:#555">
+            <i class="fas fa-cog"></i> Configurar
+        </button>
+    </div>
+
+    <div class="courses-bar" id="tabsContainer"></div>
+
+    <main>
+        <div class="toolbar">
+            <button class="btn-act btn-danger" id="reportBtn" title="Generar Reporte">
+                <i class="fas fa-bell"></i> Reporte Riesgo
+            </button>
+            <div class="tool-section" style="margin-left:10px">
+                <div><small>Min</small><br><input type="number" id="cMin" style="width:35px"></div>
+                <div><small>Apr</small><br><input type="number" id="cPass" style="width:35px"></div>
+                <div><small>Max</small><br><input type="number" id="cMax" style="width:35px"></div>
+                <div><small>Ex%</small><br><input type="number" id="cEx" style="width:35px"></div>
+                <div><small>Color</small><br><input type="color" id="cColor" style="width:30px; padding:0;"></div>
+            </div>
+            <div class="tool-section">
+                <button class="btn-act btn-blue" id="addStudentBtn"><i class="fas fa-user-plus"></i></button>
+                <button class="btn-act btn-red" id="removeStudentBtn"><i class="fas fa-user-minus"></i></button>
+                <button class="btn-act btn-green" id="addEvalBtn"><i class="fas fa-plus-circle"></i> Eval</button>
+                <button class="btn-act btn-orange" id="removeEvalBtn"><i class="fas fa-minus-circle"></i></button>
+            </div>
+            <div style="margin-left:auto; display:flex; gap:5px;">
+                <button id="addCourseBtn" style="cursor:pointer; font-size:0.8rem">+ Curso</button>
+                <button id="deleteCourseBtn" style="cursor:pointer; color:red; font-size:0.8rem">Eliminar</button>
+            </div>
+        </div>
+        <div id="tableContainer"></div>
+    </main>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--primary)">Generar Reporte</h3>
+            <div class="report-options">
+                <div class="radio-group">
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
+                        <input type="radio" name="rptType" value="eval" checked> Por Evaluación
+                    </label>
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
+                        <input type="radio" name="rptType" value="avg"> Promedio Semestral
+                    </label>
+                </div>
+                <select id="rptEvalSelect" class="select-eval"></select>
+                <button id="generateReportBtn" class="btn-act btn-blue" style="width:100%; justify-content:center;">
+                    Generar Lista
+                </button>
+            </div>
+            <div id="reportOutput" class="report-list"></div>
+            <div class="share-buttons">
+                <button class="btn-share wa" id="whatsappShareBtn">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="btn-share mail" id="mailShareBtn">
+                    <i class="fas fa-envelope"></i> Correo
+                </button>
+            </div>
+            <button id="closeReportBtn" style="margin-top:10px; width:100%; padding:8px; cursor:pointer;">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <h3>Configuración</h3>
+            <label>Título:</label><input type="text" id="confTitle" style="width:100%; margin-bottom:10px;">
+            <label>Año:</label><input type="number" id="confYear" style="width:100%; margin-bottom:10px;">
+            <label>Color:</label><input type="color" id="confColor" style="width:100%; height:40px; margin-bottom:20px;">
+            <button id="saveConfigBtn" class="btn-act btn-blue" style="width:100%">Guardar</button>
+            <button id="cancelConfigBtn" style="width:100%; margin-top:5px; padding:8px;">Cancelar</button>
+            <hr>
+            <button id="hardResetBtn" style="color:red; background:none; border:none; width:100%; cursor:pointer;">
+                Borrar datos
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
