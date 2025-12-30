@@ -1,0 +1,488 @@
+:root {
+    --primary: #2c3e50;
+    --bg: #f4f6f8;
+    --text: #333;
+    --rojo: #e74c3c;
+    --azul: #2980b9;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- HEADER --- */
+header {
+    background: var(--primary);
+    color: white;
+    padding: 10px 20px;
+    display: grid;
+    grid-template-columns: 250px 1fr 250px;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    height: 90px;
+    flex-shrink: 0;
+}
+
+.profile-section { 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+}
+
+.profile-pic { 
+    width: 65px; 
+    height: 65px; 
+    border-radius: 50%; 
+    background: rgba(255,255,255,0.2); 
+    border: 2px solid rgba(255,255,255,0.5); 
+    overflow: hidden; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.profile-pic img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+}
+
+.profile-text { 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.input-profile { 
+    background: transparent; 
+    border: none; 
+    border-bottom: 1px solid rgba(255,255,255,0.3); 
+    color: white; 
+    padding: 2px; 
+    font-size: 0.9rem; 
+    width: 150px; 
+}
+
+.input-role { 
+    font-size: 0.8rem; 
+    opacity: 0.9; 
+    margin-top: 4px; 
+}
+
+.title-section { 
+    text-align: center; 
+}
+
+.app-title { 
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    margin: 0; 
+}
+
+.year-display { 
+    font-size: 1rem; 
+    opacity: 0.8; 
+}
+
+.logo-section { 
+    display: flex; 
+    justify-content: flex-end; 
+    align-items: center; 
+}
+
+.school-logo { 
+    width: 70px; 
+    height: 70px; 
+    background: white; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    overflow: hidden; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    border: 2px solid rgba(255,255,255,0.5); 
+}
+
+.school-logo img { 
+    width: 90%; 
+    height: 90%; 
+    object-fit: contain; 
+}
+
+/* --- NAV --- */
+.nav-bar { 
+    background: white; 
+    padding: 5px 20px; 
+    border-bottom: 1px solid #ddd; 
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    flex-shrink: 0; 
+}
+
+.sem-btn { 
+    padding: 5px 20px; 
+    border: 2px solid var(--primary); 
+    background: transparent; 
+    border-radius: 15px; 
+    color: var(--primary); 
+    cursor: pointer; 
+    font-weight: bold; 
+}
+
+.sem-btn.active { 
+    background: var(--primary); 
+    color: white; 
+}
+
+.courses-bar { 
+    background: #e9ecef; 
+    padding: 8px 20px 0; 
+    display: flex; 
+    gap: 5px; 
+    overflow-x: auto; 
+    flex-shrink: 0; 
+}
+
+.course-tab { 
+    padding: 8px 20px; 
+    background: #cbd5e0; 
+    border-radius: 8px 8px 0 0; 
+    cursor: grab; 
+    user-select: none; 
+    font-weight: 500; 
+    color: #555; 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    white-space: nowrap; 
+    font-size: 0.9rem; 
+}
+
+.course-tab.active { 
+    background: white; 
+    color: var(--primary); 
+    border-top: 4px solid var(--primary); 
+    font-weight: bold; 
+}
+
+/* --- MAIN --- */
+main { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    padding: 15px; 
+    background: white; 
+    overflow: hidden; 
+}
+
+.toolbar { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    background: #f8f9fa; 
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #ddd; 
+    align-items: center; 
+    margin-bottom: 10px; 
+    flex-shrink: 0; 
+}
+
+.tool-section { 
+    border-right: 1px solid #ccc; 
+    padding-right: 10px; 
+    display: flex; 
+    gap: 5px; 
+    align-items: center;
+}
+
+#tableContainer { 
+    flex: 1; 
+    overflow-y: auto; 
+    border: 1px solid #eee; 
+    position: relative; 
+}
+
+table { 
+    width: 100%; 
+    border-collapse: separate; 
+    border-spacing: 0; 
+    min-width: 800px; 
+}
+
+th { 
+    background: var(--primary); 
+    color: white; 
+    padding: 5px; 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+    border: 1px solid rgba(255,255,255,0.2); 
+    vertical-align: top;
+}
+
+td { 
+    border: 1px solid #eee; 
+    padding: 2px; 
+    text-align: center; 
+    background: white; 
+}
+
+/* Estilos columna promedio final */
+.th-avg { 
+    background: #2c3e50; 
+    border-left: 3px solid white; 
+    z-index: 20; 
+}
+
+.td-avg { 
+    border-left: 2px solid #ddd; 
+    background: #f9f9f9; 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+}
+
+/* Inputs */
+.name-input { 
+    width: 95%; 
+    padding: 5px; 
+    border: none; 
+    background: transparent; 
+    text-align: left; 
+}
+
+.name-input:focus { 
+    background: #f0f8ff; 
+    outline: none; 
+}
+
+.score-input { 
+    width: 45px; 
+    font-size: 1rem; 
+    padding: 4px; 
+    text-align: center; 
+    border: 1px solid #ddd; 
+    border-radius: 4px; 
+    font-weight: 500; 
+}
+
+.score-input:focus { 
+    border-color: var(--primary); 
+    outline: none; 
+    background: #f0f8ff; 
+}
+
+.eval-name-input { 
+    background: rgba(255,255,255,0.1); 
+    border: none; 
+    border-bottom: 1px solid rgba(255,255,255,0.3); 
+    color: white; 
+    text-align: center; 
+    width: 90%; 
+    font-weight: bold; 
+    margin-bottom: 4px; 
+    font-size: 0.9rem;
+}
+
+.header-inputs-row { 
+    display: flex; 
+    justify-content: center; 
+    gap: 5px; 
+    align-items: center; 
+    font-size: 0.8rem;
+}
+
+.mini-input { 
+    width: 35px; 
+    text-align: center; 
+    border: none; 
+    border-radius: 3px; 
+    font-weight: bold; 
+    padding: 2px; 
+}
+
+.grade-badge { 
+    font-weight: bold; 
+    margin-left: 2px; 
+    font-size: 1rem; 
+    width: 35px; 
+    display: inline-block; 
+}
+
+.rojo { 
+    color: var(--rojo); 
+}
+
+.azul { 
+    color: #2980b9; 
+}
+
+input::-webkit-outer-spin-button, 
+input::-webkit-inner-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+input[type=number] { 
+    -moz-appearance: textfield; 
+}
+
+/* Buttons */
+.btn-act { 
+    border: none; 
+    padding: 8px 12px; 
+    border-radius: 4px; 
+    color: white; 
+    font-weight: bold; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    font-size: 0.85rem; 
+}
+
+.btn-blue { 
+    background: #3498db; 
+}
+
+.btn-red { 
+    background: #e74c3c; 
+}
+
+.btn-green { 
+    background: #27ae60; 
+}
+
+.btn-orange { 
+    background: #e67e22; 
+}
+
+.btn-danger { 
+    background: #c0392b; 
+}
+
+/* MODAL */
+.modal { 
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.5); 
+    z-index: 1000; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.modal-content { 
+    background: white; 
+    padding: 20px; 
+    width: 450px; 
+    border-radius: 8px; 
+    max-height: 90vh; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.report-options { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    margin-bottom: 15px; 
+    padding: 10px; 
+    background: #f1f1f1; 
+    border-radius: 5px; 
+}
+
+.radio-group { 
+    display: flex; 
+    gap: 15px; 
+    margin-bottom: 5px; 
+}
+
+.select-eval { 
+    padding: 8px; 
+    border-radius: 4px; 
+    border: 1px solid #ccc; 
+    width: 100%; 
+    display: none; 
+}
+
+.report-list { 
+    margin: 10px 0; 
+    padding: 10px; 
+    background: #fff; 
+    border: 1px solid #ddd; 
+    max-height: 250px; 
+    overflow-y: auto; 
+    font-family: monospace; 
+    font-size: 0.9rem; 
+    white-space: pre-line; 
+}
+
+.share-buttons { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 10px; 
+}
+
+.btn-share { 
+    flex: 1; 
+    padding: 10px; 
+    border: none; 
+    border-radius: 5px; 
+    color: white; 
+    font-weight: bold; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 5px; 
+}
+
+.wa { 
+    background: #25D366; 
+}
+
+.mail { 
+    background: #EA4335; 
+}
+
+@media print {
+    .toolbar, .nav-bar, .courses-bar, .header-controls { 
+        display: none !important; 
+    }
+    main { 
+        overflow: visible; 
+        padding: 0; 
+    }
+    #tableContainer { 
+        overflow: visible; 
+    }
+    th { 
+        position: static; 
+        color: black !important; 
+        border: 1px solid #000; 
+        background: transparent !important; 
+    } 
+    input { 
+        color: black !important; 
+    }
+    table, td { 
+        border: 1px solid #000; 
+    }
+}
+
+.dragging {
+    opacity: 0.5;
+}
